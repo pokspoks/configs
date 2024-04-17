@@ -133,7 +133,7 @@ for i = 1, 8 do
 end
 
 -- Appereance
-config.color_scheme = 'Pro (Gogh)'
+config.color_scheme = 'Nocturnal Winter'
 config.font = wezterm.font 'Terminus (TTF) for Windows'
 
 return config
