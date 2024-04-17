@@ -11,7 +11,6 @@ vim.opt.relativenumber = true
 vim.opt.numberwidth = 3
 vim.opt.showmode = false
 vim.opt.breakindent = true
-vim.opt.signcolumn = "yes"
 vim.opt.updatetime = 250
 vim.opt.splitright = true
 vim.opt.splitbelow = true
