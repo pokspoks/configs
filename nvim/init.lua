@@ -3,7 +3,7 @@ vim.opt.clipboard = "unnamedplus"
 vim.opt.undofile = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-vim.opt.timeoutlen = 300
+vim.opt.timeoutlen = 400
 
 -- Apperance
 vim.opt.number = true
@@ -28,6 +28,8 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "nzzzv")
 vim.keymap.set("n", "<esc>", "<cmd>nohlsearch<CR>")
+
+vim.keymap.set("n", "<leader>fc", "<cmd>lua vim.lsp.buf.format({async = true})<CR>")
 
 -- Tab title for wezterm
 vim.api.nvim_create_autocmd({"BufEnter"}, {
@@ -59,17 +61,62 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
 	{
 	    "kylechui/nvim-surround",
-	    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+	    version = "*", 
 	    event = "VeryLazy",
 	    config = function()
-		require("nvim-surround").setup({
-		    -- Configuration here, or leave empty to use defaults
-		})
+		require("nvim-surround").setup({})
 	    end
 	},
 	{
-		'nvim-telescope/telescope.nvim', branch = '0.1.x',
-		dependencies = { 'nvim-lua/plenary.nvim' }
+		"nvim-telescope/telescope.nvim", branch = "0.1.x",
+		dependencies = { "nvim-lua/plenary.nvim" },
+	},
+	{
+		"nvim-treesitter/nvim-treesitter",
+		build = ":TSUpdate",
+	},
+	"williamboman/mason.nvim",
+	"williamboman/mason-lspconfig.nvim",
+	"neovim/nvim-lspconfig",
+	"hrsh7th/cmp-nvim-lsp",
+	"hrsh7th/nvim-cmp",
+	"L3MON4D3/LuaSnip",
+})
+
+-- LSP
+local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+local default_setup = function(server)
+	require("lspconfig")[server].setup({
+		capabilities = lsp_capabilities,
+		settings = {
+			Lua = {diagnostics = { globals = {"vim"}}},
+		}
+	})
+end
+
+require("mason").setup({})
+require("mason-lspconfig").setup({
+	handlers = {
+		default_setup,
+	},
+})
+
+local cmp = require("cmp")
+
+cmp.setup({
+	sources = {
+		{name = "nvim_lsp"},
+	},
+	mapping = cmp.mapping.preset.insert({
+		["<CR>"] = cmp.mapping.confirm({select = false}),
+
+		["<C-Space>"] = cmp.mapping.complete(),
+	}),
+	snippet = {
+		expand = function(args)
+			require("luasnip").lsp_expand(args.body)
+		end,
 	},
 })
 
