@@ -114,12 +114,12 @@ config.keys = {
 	},
 	{
 		key = 'c',
-		mods = 'CTRL',
+		mods = 'CTRL|SHIFT',
 		action = wezterm.action.CopyTo 'Clipboard',
 	},
 	{
 		key = 'v',
-		mods = 'CTRL',
+		mods = 'CTRL|SHIFT',
 		action = wezterm.action.PasteFrom 'Clipboard',
 	},
 }
@@ -131,6 +131,15 @@ for i = 1, 8 do
 		action = wezterm.action.ActivateTab(i - 1),
 	})
 end
+
+for i = 1, 8 do
+	table.insert(config.keys, {
+		key = tostring(i),
+		mods = 'LEADER|CTRL',
+		action = wezterm.action.MoveTab(i - 1),
+	})
+end
+
 
 -- Appereance
 config.color_scheme = 'Nocturnal Winter'

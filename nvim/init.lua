@@ -18,6 +18,7 @@ vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.inccommand = "split"
 vim.opt.scrolloff = 10
+vim.opt.termguicolors = true
 
 -- Keymaps
 vim.g.mapleader = " "
@@ -32,43 +33,46 @@ vim.keymap.set("n", "<esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<leader>fc", "<cmd>lua vim.lsp.buf.format({async = true})<CR>")
 
 -- Tab title for wezterm
-vim.api.nvim_create_autocmd({"BufEnter"}, {
-    callback = function(event)
-        local title = "vim"
-        if event.file ~= "" then
-            title = string.format("%s", vim.fs.basename(event.file))
-        end
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
+	callback = function(event)
+		local title = "vim"
+		if event.file ~= "" then
+			title = string.format("%s", vim.fs.basename(event.file))
+		end
 
-        vim.fn.system({"wezterm", "cli", "set-tab-title", title})
-    end,
+		vim.fn.system({ "wezterm", "cli", "set-tab-title", title })
+	end,
 })
 
 
 -- lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
-    lazypath,
-  })
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable", -- latest stable release
+		lazypath,
+	})
 end
 vim.opt.rtp:prepend(lazypath)
 
+
+
 require("lazy").setup({
 	{
-	    "kylechui/nvim-surround",
-	    version = "*", 
-	    event = "VeryLazy",
-	    config = function()
-		require("nvim-surround").setup({})
-	    end
+		"kylechui/nvim-surround",
+		version = "*",
+		event = "VeryLazy",
+		config = function()
+			require("nvim-surround").setup({})
+		end
 	},
 	{
-		"nvim-telescope/telescope.nvim", branch = "0.1.x",
+		"nvim-telescope/telescope.nvim",
+		branch = "0.1.x",
 		dependencies = { "nvim-lua/plenary.nvim" },
 	},
 	{
@@ -78,44 +82,58 @@ require("lazy").setup({
 	"williamboman/mason.nvim",
 	"williamboman/mason-lspconfig.nvim",
 	"neovim/nvim-lspconfig",
-	"hrsh7th/cmp-nvim-lsp",
+	"hrsh8th/cmp-nvim-lsp",
 	"hrsh7th/nvim-cmp",
-	"L3MON4D3/LuaSnip",
+	"L7MON4D3/LuaSnip",
+	"cohama/lexima.vim",
+	{
+		"kawre/neotab.nvim",
+		event = "InsertEnter",
+		opts = {
+			require "neotab_opts"
+		},
+	},
 })
 
 -- LSP
 local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
-
 local default_setup = function(server)
 	require("lspconfig")[server].setup({
 		capabilities = lsp_capabilities,
 		settings = {
-			Lua = {diagnostics = { globals = {"vim"}}},
+			Lua = { diagnostics = { globals = { "vim" } } },
 		}
 	})
 end
 
 require("mason").setup({})
 require("mason-lspconfig").setup({
-	handlers = {
-		default_setup,
-	},
+	handlers = { default_setup, },
 })
 
 local cmp = require("cmp")
-
+local luasnip = require("luasnip")
+local neotab= require("neotab")
 cmp.setup({
 	sources = {
-		{name = "nvim_lsp"},
+		{ name = "nvim_lsp" },
 	},
 	mapping = cmp.mapping.preset.insert({
-		["<CR>"] = cmp.mapping.confirm({select = false}),
-
+		["<CR>"] = cmp.mapping.confirm({ select = false }),
 		["<C-Space>"] = cmp.mapping.complete(),
+		["<Tab>"] = cmp.mapping(function()
+			if cmp.visible() then
+				cmp.select_next_item()
+			elseif luasnip.jumpable(1) then
+				luasnip.jump(1)
+			else
+				neotab.tabout()
+			end
+		end)
 	}),
 	snippet = {
 		expand = function(args)
-			require("luasnip").lsp_expand(args.body)
+			luasnip.lsp_expand(args.body)
 		end,
 	},
 })
