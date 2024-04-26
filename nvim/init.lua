@@ -3,7 +3,7 @@ vim.opt.clipboard = "unnamedplus"
 vim.opt.undofile = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-vim.opt.timeoutlen = 400
+vim.opt.timeoutlen = 500
 
 -- Apperance
 vim.opt.number = true
@@ -15,10 +15,11 @@ vim.opt.updatetime = 250
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = '  ', trail = '·', nbsp = '␣' }
 vim.opt.inccommand = "split"
 vim.opt.scrolloff = 10
 vim.opt.termguicolors = true
+vim.g.netrw_bufsettings = 'noma nomod nu rnu nobl nowrap ro'
 
 -- Keymaps
 vim.g.mapleader = " "
@@ -29,8 +30,14 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "nzzzv")
 vim.keymap.set("n", "<esc>", "<cmd>nohlsearch<CR>")
+vim.keymap.set("n", "<leader>fe", "<cmd>Ex<CR>")
 
 vim.keymap.set("n", "<leader>fc", "<cmd>lua vim.lsp.buf.format({async = true})<CR>")
+
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
 -- Tab title for wezterm
 vim.api.nvim_create_autocmd({ "BufEnter" }, {
@@ -82,10 +89,11 @@ require("lazy").setup({
 	"williamboman/mason.nvim",
 	"williamboman/mason-lspconfig.nvim",
 	"neovim/nvim-lspconfig",
-	"hrsh8th/cmp-nvim-lsp",
+	"hrsh7th/cmp-nvim-lsp",
 	"hrsh7th/nvim-cmp",
-	"L7MON4D3/LuaSnip",
+	"L3MON4D3/LuaSnip",
 	"cohama/lexima.vim",
+	"iagorrr/noctis-high-contrast.nvim",
 	{
 		"kawre/neotab.nvim",
 		event = "InsertEnter",
@@ -94,6 +102,7 @@ require("lazy").setup({
 		},
 	},
 })
+vim.cmd.colorscheme "noctishc"
 
 -- LSP
 local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -138,9 +147,11 @@ cmp.setup({
 	},
 })
 
+
 -- Plugin keymaps
 local builtin = require("telescope.builtin")
 vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
 vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
 vim.keymap.set("n", "<leader>fb", builtin.buffers, {})
 vim.keymap.set("n", "<leader>fh", builtin.help_tags, {})
+

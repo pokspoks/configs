@@ -144,5 +144,7 @@ end
 -- Appereance
 config.color_scheme = 'Nocturnal Winter'
 config.font = wezterm.font 'Terminus (TTF) for Windows'
+config.use_fancy_tab_bar = false
+config.tab_bar_at_bottom = true
 
 return config
