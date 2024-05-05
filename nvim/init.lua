@@ -90,17 +90,33 @@ require("lazy").setup({
 	"williamboman/mason-lspconfig.nvim",
 	"neovim/nvim-lspconfig",
 	"hrsh7th/cmp-nvim-lsp",
-	"hrsh7th/nvim-cmp",
-	"L3MON4D3/LuaSnip",
-	"cohama/lexima.vim",
-	"iagorrr/noctis-high-contrast.nvim",
 	{
 		"kawre/neotab.nvim",
 		event = "InsertEnter",
 		opts = {
-			require "neotab_opts"
+			tabkey = "",
 		},
 	},
+	"hrsh7th/nvim-cmp",
+	{
+		"L3MON4D3/LuaSnip",
+		dependencies = { "neotab.nvim", },
+		keys = {
+			{
+				"<Tab>",
+				function()
+					return require("luasnip").jumpable(1)
+					and "<Plug>luasnip-jump-next"
+					or "<Plug>neotab-out"
+				end,
+				expr = true,
+				silent = true,
+				mode = "i",
+			},
+		},
+	},
+	"cohama/lexima.vim", -- Auto close paranthesis
+	"iagorrr/noctis-high-contrast.nvim",
 })
 vim.cmd.colorscheme "noctishc"
 
@@ -122,7 +138,7 @@ require("mason-lspconfig").setup({
 
 local cmp = require("cmp")
 local luasnip = require("luasnip")
-local neotab= require("neotab")
+local neotab = require("neotab")
 cmp.setup({
 	sources = {
 		{ name = "nvim_lsp" },
@@ -154,4 +170,3 @@ vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
 vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
 vim.keymap.set("n", "<leader>fb", builtin.buffers, {})
 vim.keymap.set("n", "<leader>fh", builtin.help_tags, {})
-
